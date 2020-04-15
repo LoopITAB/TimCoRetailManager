@@ -1,6 +1,8 @@
 ﻿
 using Caliburn.Micro;
 using System;
+using System.Threading.Tasks;
+using TRMDesktopUI.Helpers;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -8,6 +10,12 @@ namespace TRMDesktopUI.ViewModels
     {
         private string _userName;
         private string _password;
+        private IAPIHelper _apiHelper;
+
+        public LoginViewModel(IAPIHelper apiHelper)
+        {
+            _apiHelper = apiHelper;
+        }
 
         public string UserName
         {
@@ -46,7 +54,6 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-
         //public bool CanLogIn(string userName, string password)
         //{
         //    bool output = false;
@@ -64,9 +71,17 @@ namespace TRMDesktopUI.ViewModels
         //    Console.WriteLine();
         //}
 
-        public void LogIn()
+        public async Task LogIn()
         {
-            Console.WriteLine();
+            try
+            {
+                var result = await _apiHelper.Authenticate(UserName, Password);
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
         }
 
     }
