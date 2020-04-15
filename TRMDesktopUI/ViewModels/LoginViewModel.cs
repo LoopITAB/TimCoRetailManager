@@ -11,6 +11,7 @@ namespace TRMDesktopUI.ViewModels
         private string _userName;
         private string _password;
         private IAPIHelper _apiHelper;
+        //private bool _isErrorVisible;
 
         public LoginViewModel(IAPIHelper apiHelper)
         {
@@ -36,6 +37,41 @@ namespace TRMDesktopUI.ViewModels
                 _password = value;
                 NotifyOfPropertyChange(() => Password);
                 NotifyOfPropertyChange(() => CanLogIn);
+            }
+        }
+
+        public bool IsErrorVisible
+        {
+            get
+            {
+                bool output = false;
+
+                if (ErrorMessage?.Length > 0)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+
+            //get { return _isErrorVisible; }
+            //set
+            //{
+            //    NotifyOfPropertyChange(() => IsErrorVisible);
+            //    _isErrorVisible = value;
+            //}
+        }
+
+        private string _errorMessage;
+
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+            set
+            {
+                _errorMessage = value;
+                NotifyOfPropertyChange(() => IsErrorVisible);
+                NotifyOfPropertyChange(() => ErrorMessage);
             }
         }
 
@@ -75,12 +111,14 @@ namespace TRMDesktopUI.ViewModels
         {
             try
             {
+                ErrorMessage = string.Empty;
                 var result = await _apiHelper.Authenticate(UserName, Password);
             }
             catch (Exception ex)
             {
+                //Console.WriteLine(ex.Message);
+                ErrorMessage = ex.Message;
 
-                Console.WriteLine(ex.Message);
             }
         }
 
