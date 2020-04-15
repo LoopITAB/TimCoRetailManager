@@ -1,9 +1,12 @@
-﻿using Caliburn.Micro;
+﻿
+using Caliburn.Micro;
 using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Collections.Generic;
 using TRMDesktopUI.ViewModels;
-using System.Linq;
+using TRMDesktopUI.Helpers;
 
 namespace TRMDesktopUI
 {
@@ -14,6 +17,8 @@ namespace TRMDesktopUI
         public Bootstrapper()
         {
             Initialize();
+
+            ConventionManager.AddElementConvention<PasswordBox>(PasswordBoxHelper.BoundPasswordProperty, "Password", "PasswordChanged");
         }
 
         protected override void Configure()
