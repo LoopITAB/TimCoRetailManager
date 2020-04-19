@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
@@ -16,10 +17,12 @@ namespace TRMDesktopUI.ViewModels
         private int _itemQuantity = 1;
 
         private IProductEndPoint _productEndpoint;
+        private IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndPoint productEndpoint)
+        public SalesViewModel(IProductEndPoint productEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -76,6 +79,33 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+        private decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+
+            foreach (var item in Cart)
+            {
+                subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+            }
+
+            return subTotal;
+        }
+        private decimal CalculateTax()
+        {
+            decimal taxAmount = 0;
+            decimal taxRate = _configHelper.GetTaxRate();
+
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * (taxRate / 100));
+                }
+            }
+
+            return taxAmount;
+        }
+
         public string SubTotal
         {
             get
@@ -95,23 +125,36 @@ namespace TRMDesktopUI.ViewModels
                 //return subTotal.ToString("C");
 
                 // -----------------------------------------------------
-                return Cart.Sum(item => item.Product.RetailPrice * item.QuantityInCart).ToString("C");
+                //return CalculateSubTotal().ToString("C");
+
+                // -----------------------------------------------------
+                return Cart.Sum(item => item.Product.RetailPrice * item.QuantityInCart)
+                           .ToString("C");
             }
         }
         public string Total
         {
             get
             {
-                // TODO - Replace with calculation
-                return "$0.00";
+                //// TODO - Replace with calculation
+                //return "$0.00";
+
+                decimal total = CalculateSubTotal() + CalculateTax();
+                return total.ToString("C");
             }
         }
         public string Tax
         {
             get
             {
-                // TODO - Replace with calculation
-                return "$0.00";
+                //// TODO - Replace with calculation
+                //return "$0.00";
+
+                //return CalculateTax().ToString("C");
+
+                return Cart.Where(tax => tax.Product.IsTaxable)
+                           .Sum(item => item.Product.RetailPrice * item.QuantityInCart * (_configHelper.GetTaxRate() / 100))
+                           .ToString("C");
             }
         }
 
@@ -160,7 +203,9 @@ namespace TRMDesktopUI.ViewModels
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
-            NotifyOfPropertyChange(() => Cart);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            //NotifyOfPropertyChange(() => Cart);
         }
 
         public bool CanRemoveFromCart
@@ -178,6 +223,8 @@ namespace TRMDesktopUI.ViewModels
         public void RemoveFromCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanCheckOut
