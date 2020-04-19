@@ -226,6 +226,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004191401033_EFData Initial.cs" />
+    <Compile Include="Migrations\202004191401033_EFData Initial.designer.cs">
+      <DependentUpon>202004191401033_EFData Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -328,6 +333,11 @@
       <Project>{58AD10A0-F444-44BC-B53E-1624A72D4D75}</Project>
       <Name>TRMDataManager.Library</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202004191401033_EFData Initial.resx">
+      <DependentUpon>202004191401033_EFData Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
