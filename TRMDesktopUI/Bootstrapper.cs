@@ -25,7 +25,8 @@ namespace TRMDesktopUI
 
         protected override void Configure()
         {
-            _container.Instance(_container);
+            _container.Instance(_container)
+                .PerRequest<IProductEndPoint, ProductEndPoint>();
 
             _container
                 .Singleton<IWindowManager, WindowManager>()
@@ -42,7 +43,9 @@ namespace TRMDesktopUI
             // we don't create interfaces for each ViewModel for now!
             // that's why we have viewModelType in both places above!
 
+
         }
+
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
