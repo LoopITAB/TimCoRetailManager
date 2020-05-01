@@ -5,12 +5,14 @@ namespace TRMDesktopUI.Library.Models
     {
         public ProductModel Product { get; set; }
         public int QuantityInCart { get; set; }
-        public string DisplayText
-        {
-            get
-            {
-                return $"({QuantityInCart}) {Product.ProductName}";
-            }
-        }
+        ////DisplayText is no longer needed, after we created CartItemDisplayModel in the UI project.
+        ////Much cleaner now !!!!!
+        //public string DisplayText
+        //{
+        //    get
+        //    {
+        //        return $"({QuantityInCart}) {Product.ProductName}";
+        //    }
+        //}
     }
 }

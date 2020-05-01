@@ -10,6 +10,8 @@ using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Models;
 using TRMDesktopUI.Library.Helpers;
+using AutoMapper;
+using TRMDesktopUI.Models;
 
 namespace TRMDesktopUI
 {
@@ -24,8 +26,38 @@ namespace TRMDesktopUI
             ConventionManager.AddElementConvention<PasswordBox>(PasswordBoxHelper.BoundPasswordProperty, "Password", "PasswordChanged");
         }
 
+        private IMapper ConfigureAutomapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+            var mapper = config.CreateMapper();
+            return mapper;
+        }
+
         protected override void Configure()
         {
+            //// AUTOMAPPER
+            //// uses some reflection at the startup.
+            //// This is the automapper configuration, step 1)
+            //var config = new MapperConfiguration(cfg =>
+            //{
+            //    cfg.CreateMap<ProductModel, ProductDisplayModel>();
+            //    cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            //});
+            //// Now create the mapper, step 2)
+            //var mapper = config.CreateMapper();
+            //// Now add to Dependency Injection System, our Container, step 3)
+            //_container.Instance(mapper);
+            ////_container.Instance<IMapper>(mapper); it is redundant !!
+            //// Use Constructor DI to use the mapper, step 4)
+            //// Use mapper.Map<TargetStructure>(Source Object); step 5)
+            // Above part was extracted to it's own method, ConfigureAutomapper.
+
+            _container.Instance(ConfigureAutomapper());
+
             _container.Instance(_container)
                 .PerRequest<IProductEndPoint, ProductEndPoint>()
                 .PerRequest<ISaleEndPoint, SaleEndPoint>();
