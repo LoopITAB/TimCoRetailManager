@@ -1,6 +1,7 @@
 ﻿
 using Caliburn.Micro;
 using TRMDesktopUI.EventModels;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -13,13 +14,15 @@ namespace TRMDesktopUI.ViewModels
         // LoginVM can be refreshed each time we use it.
         //private LoginViewModel _loginVM;
         private SalesViewModel _salesVM;
+        private readonly ILoggedInUserModel _user;
         private IEventAggregator _events;
         //private SimpleContainer _container;
 
-        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM)
+        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM, ILoggedInUserModel user)
         {
             //_loginVM = loginVM;
             _salesVM = salesVM;
+            _user = user;
             _events = events;
             //_container = container;
 
@@ -30,15 +33,42 @@ namespace TRMDesktopUI.ViewModels
             ActivateItem(IoC.Get<LoginViewModel>());
         }
 
+        public bool IsLoggedIn
+        {
+            get
+            {
+                bool output = false;
+
+                if (string.IsNullOrWhiteSpace(_user.Token) == false)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+        }
+
         public void Handle(LogOnEvent message)
         {
             //throw new System.NotImplementedException();
 
             ActivateItem(_salesVM);
             //_loginVM = _container.GetInstance<LoginViewModel>();
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
+        public void ExitApplication()
+        {
+            //this.ExitApplication();
+            TryClose();
+        }
 
+        public void LogOut()
+        {
+            _user.LogOffUser();
+            ActivateItem(IoC.Get<LoginViewModel>());
+            NotifyOfPropertyChange(() => IsLoggedIn);
+        }
 
     }
 }
