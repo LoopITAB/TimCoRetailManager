@@ -16,6 +16,7 @@ namespace TRMDesktopUI.ViewModels
     {
         private BindingList<ProductDisplayModel> _products;
         private ProductDisplayModel _selectedProduct;
+        private CartItemDisplayModel _selectedCartItem;
         private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();
         private int _itemQuantity = 1;
 
@@ -24,8 +25,8 @@ namespace TRMDesktopUI.ViewModels
         private IConfigHelper _configHelper;
         private IMapper _mapper;
 
-        public SalesViewModel(IProductEndPoint productEndpoint, 
-                              ISaleEndPoint saleEndpoint, 
+        public SalesViewModel(IProductEndPoint productEndpoint,
+                              ISaleEndPoint saleEndpoint,
                               IConfigHelper configHelper,
                               IMapper mapper)
         {
@@ -67,6 +68,17 @@ namespace TRMDesktopUI.ViewModels
             {
                 _selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
+            }
+        }
+        public CartItemDisplayModel SelectedCartItem
+        {
+            get { return _selectedCartItem; }
+            set
+            {
+                _selectedCartItem = value;
+                NotifyOfPropertyChange(() => SelectedCartItem);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
             }
         }
 
@@ -227,6 +239,10 @@ namespace TRMDesktopUI.ViewModels
                 bool output = false;
 
                 // Make sure something is selected.
+                if (SelectedCartItem != null && SelectedCartItem?.Product.QuantityInStock > 0)
+                {
+                    output = true;
+                }
 
                 return output;
             }
@@ -234,6 +250,17 @@ namespace TRMDesktopUI.ViewModels
 
         public void RemoveFromCart()
         {
+            SelectedCartItem.Product.QuantityInStock += 1;
+
+            if (SelectedCartItem.QuantityInCart > 1)
+            {
+                SelectedCartItem.QuantityInCart -= 1;
+            }
+            else
+            {
+                Cart.Remove(SelectedCartItem);
+            }
+
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
