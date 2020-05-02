@@ -14,4 +14,8 @@ BEGIN
 
 	--SELECT @Id = @@Identity;
 	SELECT @Id = Scope_Identity();
+
+	--INSERT INTO dbo.SaleDetail(SaleId, ProductId, Quantity, PurchasePrice, Tax)
+	--SELECT @Id, ProductId, Quantity, PurchasePrice, Tax
+	--FROM @TVP
 END
