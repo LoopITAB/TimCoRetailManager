@@ -48,7 +48,7 @@ namespace TRMDataManager.Library.DataAccess
 
                 if (productInfo.IsTaxable)
                 {
-                    detail.Tax = (detail.PurchasePrice * (taxRate/100));
+                    detail.Tax = (detail.PurchasePrice * (taxRate / 100));
                 }
 
                 details.Add(detail);
@@ -66,21 +66,51 @@ namespace TRMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            // Save the Sale model
-
-            SqlDataAccess sql = new SqlDataAccess();
-            sql.SaveData("dbo.spSale_Insert", sale, "TRMData");
-
-            // Get the ID from the Sale Model
-            sale.Id = sql.LoadData<int, dynamic>("spSale_Lookup", new { CashierId = sale.UserId, sale.SaleDate }, "TRMData").FirstOrDefault();
-            
-            // Finish filling in the Sale Detail Models
-            foreach (var item in details)
+            // NEW WAY WITH TRANSACTION:
+            using (SqlDataAccess sql = new SqlDataAccess())
             {
-                item.SaleId = sale.Id;
-                // Save the Sale Detail Models
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "TRMData");
+                try
+                {
+                    sql.StartTransaction("TRMData");
+
+                    // Save the Sale model
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
+
+                    // Get the ID from the Sale Model
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("spSale_Lookup", new { CashierId = sale.UserId, sale.SaleDate }).FirstOrDefault();
+
+                    // Finish filling in the Sale Detail Models
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+                        // Save the Sale Detail Models
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+
+                    sql.CommitTransaction();
+                }
+                catch
+                {
+                    sql.RollbackTransaction();
+                    throw;
+                }
             }
+
+            //// OLD WAY WITHOUT TRANSACTION:
+            // Save the Sale model
+            //SqlDataAccess sql = new SqlDataAccess();
+            //sql.SaveData("dbo.spSale_Insert", sale, "TRMData");
+
+            //// Get the ID from the Sale Model
+            //sale.Id = sql.LoadData<int, dynamic>("spSale_Lookup", new { CashierId = sale.UserId, sale.SaleDate }, "TRMData").FirstOrDefault();
+
+            //// Finish filling in the Sale Detail Models
+            //foreach (var item in details)
+            //{
+            //    item.SaleId = sale.Id;
+            //    // Save the Sale Detail Models
+            //    sql.SaveData("dbo.spSaleDetail_Insert", item, "TRMData");
+            //}
         }
 
 
