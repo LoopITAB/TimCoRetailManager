@@ -12,5 +12,6 @@ BEGIN
 	INSERT INTO [dbo].[Sale](UserId, SaleDate, SubTotal, Tax, Total)
 	VALUES (@UserId, @SaleDate, @SubTotal, @Tax, @Total);
 
-	SELECT @Id = @@Identity;
+	--SELECT @Id = @@Identity;
+	SELECT @Id = Scope_Identity();
 END
