@@ -8,6 +8,8 @@ namespace TRMDataManager.Controllers
     [Authorize]
     public class InventoryController : ApiController
     {
+        // OR RELATIONSHIP
+        [Authorize(Roles = "Manager,Admin")]
         public List<InventoryModel> Get()
         {
             InventoryData data = new InventoryData();
@@ -15,6 +17,8 @@ namespace TRMDataManager.Controllers
             return data.GetInventory();
         }
 
+        //[Authorize(Roles = "WarehouseWorker")] AND RELATIONSHIP
+        [Authorize(Roles = "Admin")]
         public void Post([FromBody] InventoryModel item)
         {
             InventoryData data = new InventoryData();
