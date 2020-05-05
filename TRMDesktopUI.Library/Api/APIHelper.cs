@@ -32,6 +32,7 @@ namespace TRMDesktopUI.Library.Api
         private void initializeClient()
         {
             string api = ConfigurationManager.AppSettings["api"];
+            //string api = Environment.GetEnvironmentVariable("api");
 
             _apiClient = new HttpClient();
             _apiClient.BaseAddress = new Uri(api);
