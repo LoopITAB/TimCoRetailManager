@@ -4,12 +4,14 @@ using System.Linq;
 using System.Collections.Generic;
 using TRMDataManager.Library.Models;
 using TRMDataManager.Library.Internal.DataAccess;
-
+using Microsoft.Extensions.Configuration;
 
 namespace TRMDataManager.Library.DataAccess
 {
     public class SaleData
     {
+        private readonly IConfiguration _config;
+
         //public List<ProductModel> GetProducts()
         //{
         //    SqlDataAccess sql = new SqlDataAccess();
@@ -19,13 +21,18 @@ namespace TRMDataManager.Library.DataAccess
         //    return output;
         //}
 
+        public SaleData(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             //TODO: Make this SOLID/DRY/Better
             // Start filling int the models we will save to the database
 
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
-            ProductData product = new ProductData();
+            ProductData product = new ProductData(_config);
             var taxRate = ConfigHelper.GetTaxRate();
 
             foreach (var item in saleInfo.SaleDetails)
@@ -67,7 +74,7 @@ namespace TRMDataManager.Library.DataAccess
             sale.Total = sale.SubTotal + sale.Tax;
 
             // NEW WAY WITH TRANSACTION:
-            using (SqlDataAccess sql = new SqlDataAccess())
+            using (SqlDataAccess sql = new SqlDataAccess(_config))
             {
                 try
                 {
@@ -116,7 +123,7 @@ namespace TRMDataManager.Library.DataAccess
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sql = new SqlDataAccess();
+            SqlDataAccess sql = new SqlDataAccess(_config);
 
             var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
 
