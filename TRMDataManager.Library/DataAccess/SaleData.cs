@@ -1,10 +1,10 @@
 ﻿
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using TRMDataManager.Library.Models;
-using TRMDataManager.Library.Internal.DataAccess;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TRMDataManager.Library.Internal.DataAccess;
+using TRMDataManager.Library.Models;
 
 namespace TRMDataManager.Library.DataAccess
 {
