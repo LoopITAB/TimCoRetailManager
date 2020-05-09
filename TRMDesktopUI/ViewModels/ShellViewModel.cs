@@ -16,16 +16,19 @@ namespace TRMDesktopUI.ViewModels
 
         // LoginVM can be refreshed each time we use it.
         //private LoginViewModel _loginVM;
-        private SalesViewModel _salesVM;
+        //private SalesViewModel _salesVM;
         private readonly ILoggedInUserModel _user;
         private readonly IAPIHelper _apiHelper;
         private IEventAggregator _events;
         //private SimpleContainer _container;
 
-        public ShellViewModel(IEventAggregator events, SalesViewModel salesVM, ILoggedInUserModel user, IAPIHelper apiHelper)
+        public ShellViewModel(IEventAggregator events,
+                              //SalesViewModel salesVM,
+                              ILoggedInUserModel user,
+                              IAPIHelper apiHelper)
         {
             //_loginVM = loginVM;
-            _salesVM = salesVM;
+            //_salesVM = salesVM;
             _user = user;
             _apiHelper = apiHelper;
             _events = events;
@@ -83,7 +86,11 @@ namespace TRMDesktopUI.ViewModels
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(_salesVM, cancellationToken);
+            //await ActivateItemAsync(_salesVM, cancellationToken);
+            // The above way we got the same salesmodel each time, and that gave us a bug.
+            // The below way we get a new salesmodel each time, no bug.
+            // And that's why it can be removed from Constructor.
+            await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
